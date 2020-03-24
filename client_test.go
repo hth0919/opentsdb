@@ -18,9 +18,9 @@ func TestPut(t *testing.T) {
 	}
 	rr, err := c.Put([]*UniMetric{metric})
 	if err != nil {
-		log.Logger.Println("errInfo: ", err)
+		log.Println("errInfo: ", err)
 	} else {
-		log.Logger.Println("put.resp.info", rr.RespInfo)
+		log.Println("put.resp.info", rr.RespInfo)
 	}
 	c.Close()
 }
@@ -34,11 +34,11 @@ func TestQueryGet(t *testing.T) {
 	}
 	queryRsp, errRsp, err := c.QueryByGet(query)
 	if err != nil {
-		log.Logger.Println("err: %+v", err)
+		log.Println("err: %+v", err)
 	} else if errRsp != nil {
-		log.Logger.Println("err: %+v", *errRsp)
+		log.Println("err: %+v", *errRsp)
 	} else {
-		log.Logger.Println("query.get.info: %+v", *queryRsp)
+		log.Println("query.get.info: %+v", *queryRsp)
 	}
 	c.Close()
 }
@@ -56,11 +56,11 @@ func TestQueryPost(t *testing.T) {
 	}
 	queryRsp, errRsp, err := c.QueryByPost(query)
 	if err != nil {
-		log.Logger.Println("err: %+v", err)
+		log.Println("err: %+v", err)
 	} else if errRsp != nil {
-		log.Logger.Println("err: %+v", *errRsp)
+		log.Println("err: %+v", *errRsp)
 	} else {
-		log.Logger.Println("query.post.info: %+v", *queryRsp)
+		log.Println("query.post.info: %+v", *queryRsp)
 	}
 	c.Close()
 }

@@ -32,11 +32,11 @@ func (c *Client) putMetrics(metrics []*UniMetric) (putResp *PutResponse, err err
 	}
 
 	metricsStr, _ := json.Marshal(metrics)
-	log.Logger.Println("put.metrics", string(metricsStr))
+	log.Println("put.metrics", string(metricsStr))
 	req := NewRequest("POST", c.putUrl, string(metricsStr))
 
 	rr, err := c.SendRequest(req)
-	log.Logger.Printf("put.post.resp statusCode:%d body:%s", string(rr.StatusCode), string(rr.Body))
+	log.Printf("put.post.resp statusCode:%d body:%s", string(rr.StatusCode), string(rr.Body))
 	putResp = &PutResponse{
 		StatusCode: rr.StatusCode,
 		RespInfo:   string(rr.Body),
@@ -54,14 +54,14 @@ func (c *Client) queryGet(query *QueryRequestGet) (queryResp *QueryResponse, err
 	httpPath += startTimeOptions
 	options := PackQueryString(query)
 	httpPath += options
-	log.Logger.Printf("query.get:%s", options)
+	log.Printf("query.get:%s", options)
 
 	req := NewRequest("GET", httpPath, "")
 	rr, err := c.SendRequest(req)
 	if err != nil {
 		return nil, nil, err
 	}
-	log.Logger.Printf("query.get.resp statusCode:%d body:%s", string(rr.StatusCode), string(rr.Body))
+	log.Printf("query.get.resp statusCode:%d body:%s", string(rr.StatusCode), string(rr.Body))
 	queryResp, errResp, err = rr.DecodeQueryResp()
 	if err != nil {
 		return nil, nil, err
@@ -76,14 +76,14 @@ func (c *Client) queryPost(query *QueryRequestPost) (queryResp *QueryResponse, e
 
 	httpPath := c.queryUrl
 	metricsStr, _ := json.Marshal(query)
-	log.Logger.Println("query.post", string(metricsStr))
+	log.Println("query.post", string(metricsStr))
 
 	req := NewRequest("POST", httpPath, string(metricsStr))
 	rr, err := c.SendRequest(req)
 	if err != nil {
 		return nil, nil, err
 	}
-	log.Logger.Printf("query.post.resp statusCode:%d body:%s", string(rr.StatusCode), string(rr.Body))
+	log.Printf("query.post.resp statusCode:%d body:%s", string(rr.StatusCode), string(rr.Body))
 	queryResp, errResp, err = rr.DecodeQueryResp()
 	if err != nil {
 		return nil, nil, err
@@ -100,18 +100,18 @@ func (c *Client) SendRequest(rr *RawRequest) (*RawResponse, error) {
 	var err error
 
 	for attempt := 0; attempt < RETRY_TIMES; attempt++ {
-		log.Logger.Println("Connecting to opentsdb ", attempt+1, " for ", rr.HttpPath, " | method ", rr.Method)
+		log.Println("Connecting to opentsdb ", attempt+1, " for ", rr.HttpPath, " | method ", rr.Method)
 
 		req, err := func() (*http.Request, error) {
 			if rr.Values == "" {
 				if req, err = http.NewRequest(rr.Method, rr.HttpPath, nil); err != nil {
-					log.Logger.Println("http.NewRequest err", err, "request", *rr)
+					log.Println("http.NewRequest err", err, "request", *rr)
 					return nil, err
 				}
 			} else {
 				body := strings.NewReader(rr.Values)
 				if req, err = http.NewRequest(rr.Method, rr.HttpPath, body); err != nil {
-					log.Logger.Println("http.NewRequest err", err, "request", *rr)
+					log.Println("http.NewRequest err", err, "request", *rr)
 					return nil, err
 
 				}
@@ -123,16 +123,16 @@ func (c *Client) SendRequest(rr *RawRequest) (*RawResponse, error) {
 		}()
 		resp, err = c.httpClient.Do(req)
 		if err != nil {
-			log.Logger.Println("network error: ", err.Error())
+			log.Println("network error: ", err.Error())
 			continue
 		}
 
-		log.Logger.Println("recv.response.from ", rr.HttpPath)
+		log.Println("recv.response.from ", rr.HttpPath)
 		// valid http status code
 		if validHttpStatusCode[resp.StatusCode] {
 			respBody, err = ioutil.ReadAll(resp.Body)
 			if err == nil {
-				log.Logger.Println("recv.success", rr.HttpPath)
+				log.Println("recv.success", rr.HttpPath)
 				break
 			}
 			if err == io.ErrUnexpectedEOF {
@@ -142,7 +142,7 @@ func (c *Client) SendRequest(rr *RawRequest) (*RawResponse, error) {
 		}
 		resp.Body.Close()
 	}
-	log.Logger.Println("resp", *resp)
+	log.Println("resp", *resp)
 	if resp == nil {
 		return nil, err
 	}
